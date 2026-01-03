@@ -1,0 +1,713 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Profit &amp; Control Scorecard</title>
+<style>
+#profit-control-calculator {
+  font-family: Arial, sans-serif;
+  max-width: 960px;
+  margin: 20px auto;
+  color: #1f2937;
+}
+#profit-control-calculator *, #profit-control-calculator *::before, #profit-control-calculator *::after {
+  box-sizing: border-box;
+}
+#profit-control-calculator .pcs-card {
+  background: #ffffff;
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  box-shadow: 0 6px 18px rgba(17, 24, 39, 0.06);
+  padding: 24px;
+  margin-bottom: 16px;
+}
+#profit-control-calculator .pcs-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 12px;
+  gap: 12px;
+}
+#profit-control-calculator .pcs-title {
+  margin: 0;
+  font-size: 26px;
+  font-weight: 700;
+}
+#profit-control-calculator .pcs-subtitle {
+  margin: 4px 0 0;
+  color: #4b5563;
+  font-size: 16px;
+}
+#profit-control-calculator .pcs-progress {
+  height: 10px;
+  background: #e5e7eb;
+  border-radius: 999px;
+  overflow: hidden;
+  margin: 16px 0 24px;
+}
+#profit-control-calculator .pcs-progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #2563eb, #22c55e);
+  width: 0;
+  transition: width 0.3s ease;
+}
+#profit-control-calculator .pcs-question {
+  padding: 16px;
+  border: 1px solid #e5e7eb;
+  border-radius: 10px;
+  margin-bottom: 12px;
+}
+#profit-control-calculator .pcs-question h4 {
+  margin: 0 0 10px;
+  font-size: 16px;
+}
+#profit-control-calculator .pcs-options {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 8px;
+}
+#profit-control-calculator .pcs-option {
+  border: 1px solid #d1d5db;
+  border-radius: 8px;
+  text-align: center;
+  padding: 10px 6px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  background: #f9fafb;
+}
+#profit-control-calculator input[type="radio"] {
+  display: none;
+}
+#profit-control-calculator input[type="radio"]:checked + label {
+  border-color: #2563eb;
+  background: #eff6ff;
+  color: #1d4ed8;
+  font-weight: 700;
+}
+#profit-control-calculator label span {
+  display: block;
+  font-size: 12px;
+  color: #6b7280;
+  margin-top: 4px;
+}
+#profit-control-calculator .pcs-nav {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
+  margin-top: 20px;
+}
+#profit-control-calculator .pcs-nav button, #profit-control-calculator .pcs-action button {
+  border: none;
+  border-radius: 10px;
+  padding: 12px 18px;
+  cursor: pointer;
+  font-weight: 700;
+  transition: transform 0.1s ease, box-shadow 0.2s ease;
+}
+#profit-control-calculator .pcs-btn-primary {
+  background: #2563eb;
+  color: #fff;
+  box-shadow: 0 4px 12px rgba(37, 99, 235, 0.25);
+}
+#profit-control-calculator .pcs-btn-secondary {
+  background: #e5e7eb;
+  color: #111827;
+}
+#profit-control-calculator button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  box-shadow: none;
+}
+#profit-control-calculator .pcs-reset {
+  font-size: 13px;
+  color: #6b7280;
+  cursor: pointer;
+  text-decoration: underline;
+}
+#profit-control-calculator .pcs-pillars {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 12px;
+}
+#profit-control-calculator .pcs-pill {
+  display: inline-block;
+  padding: 4px 10px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 700;
+  color: #fff;
+}
+#profit-control-calculator .pcs-pill.green { background: #16a34a; }
+#profit-control-calculator .pcs-pill.blue { background: #2563eb; }
+#profit-control-calculator .pcs-pill.amber { background: #d97706; }
+#profit-control-calculator .pcs-pill.purple { background: #7c3aed; }
+#profit-control-calculator .pcs-bar {
+  background: #e5e7eb;
+  height: 10px;
+  border-radius: 999px;
+  overflow: hidden;
+  margin-top: 8px;
+}
+#profit-control-calculator .pcs-bar-fill {
+  height: 100%;
+  border-radius: 999px;
+}
+#profit-control-calculator .pcs-results-grid {
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  gap: 16px;
+}
+#profit-control-calculator .pcs-actions ul {
+  padding-left: 18px;
+  margin: 8px 0 0;
+  color: #374151;
+}
+#profit-control-calculator .pcs-actions li { margin-bottom: 4px; }
+#profit-control-calculator .pcs-highlight {
+  border: 2px solid #2563eb;
+}
+#profit-control-calculator .pcs-muted {
+  color: #4b5563;
+  font-size: 14px;
+}
+#profit-control-calculator .pcs-badge {
+  display: inline-block;
+  padding: 4px 8px;
+  border-radius: 6px;
+  background: #2563eb;
+  color: #fff;
+  font-size: 12px;
+  font-weight: 700;
+  margin-left: 8px;
+}
+#profit-control-calculator .pcs-microcopy {
+  color: #6b7280;
+  font-size: 14px;
+  margin: 8px 0 16px;
+}
+#profit-control-calculator .pcs-text-center { text-align: center; }
+#profit-control-calculator .pcs-control-index {
+  font-size: 42px;
+  margin: 0;
+}
+#profit-control-calculator .pcs-band {
+  font-weight: 700;
+  color: #111827;
+}
+#profit-control-calculator .pcs-export {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-top: 16px;
+}
+@media (max-width: 768px) {
+  #profit-control-calculator .pcs-results-grid {
+    grid-template-columns: 1fr;
+  }
+  #profit-control-calculator .pcs-options {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  #profit-control-calculator .pcs-header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+}
+</style>
+</head>
+<body>
+<div id="profit-control-calculator"></div>
+<script>
+(function() {
+  const container = document.getElementById('profit-control-calculator');
+  const storageKey = 'profitControlScorecard_v1';
+
+  const pillars = [
+    { key: 'profitClarity', name: 'Profit Clarity', color: 'green', accent: '#16a34a', questions: [
+      { id: 'PC1', text: 'I can clearly name the top 3 things that create most of our profit.' },
+      { id: 'PC2', text: 'I know which customers drain time/margin even if revenue looks good.' },
+      { id: 'PC3', text: 'We track a small set of numbers that actually drive net profit.' },
+      { id: 'PC4', text: 'We know which products/services have clean delivery (low friction).' },
+      { id: 'PC5', text: 'I can separate “busy activity” from “profit impact” quickly.' },
+      { id: 'PC6', text: 'Pricing and discounting decisions are intentional, not reactive.' }
+    ]},
+    { key: 'decisionDiscipline', name: 'Decision Discipline', color: 'blue', accent: '#2563eb', questions: [
+      { id: 'DD1', text: 'The business makes key decisions early, not under pressure.' },
+      { id: 'DD2', text: 'We know which decisions matter most (and ignore the rest).' },
+      { id: 'DD3', text: 'Decision ownership is clear (who decides what).' },
+      { id: 'DD4', text: 'We have simple decision rules (when to say yes/no).' },
+      { id: 'DD5', text: 'Problems are handled at the right level, not escalated by default.' },
+      { id: 'DD6', text: 'We have a consistent cadence for reviewing priorities and performance.' }
+    ]},
+    { key: 'operationalSimplicity', name: 'Operational Simplicity', color: 'amber', accent: '#d97706', questions: [
+      { id: 'OS1', text: 'Our workflows are simple and repeatable.' },
+      { id: 'OS2', text: 'Handoffs between people are clear (no constant rework).' },
+      { id: 'OS3', text: "We don’t rely on memory to run day-to-day operations." },
+      { id: 'OS4', text: 'Meetings replace very few decisions (most decisions happen outside meetings).' },
+      { id: 'OS5', text: 'Admin load is controlled (it doesn’t expand endlessly).' },
+      { id: 'OS6', text: 'If someone is away, the work still moves without chaos.' }
+    ]},
+    { key: 'ownerLeverage', name: 'Owner Leverage', color: 'purple', accent: '#7c3aed', questions: [
+      { id: 'OL1', text: 'My involvement is mostly high-value decisions, not firefighting.' },
+      { id: 'OL2', text: 'I can step away for 2 weeks without the business stalling.' },
+      { id: 'OL3', text: 'There is a clear second-in-command for day-to-day decisions.' },
+      { id: 'OL4', text: 'The team can solve most problems without me.' },
+      { id: 'OL5', text: 'I spend protected time working on the business, not just in it.' },
+      { id: 'OL6', text: 'I’m not the bottleneck for approvals, customers, or delivery.' }
+    ]}
+  ];
+
+  const insightTemplates = {
+    profitClarity: [
+      'You’re likely mistaking movement for profit. Attention is scattered, and margin is leaking quietly.',
+      'You have some visibility, but not enough to protect margin consistently.',
+      'You can see what drives profit most of the time — now tighten the rules around it.',
+      'Profit drivers are clear. Your next win is defending them from distractions and discounting.'
+    ],
+    decisionDiscipline: [
+      'Decisions are happening late or emotionally — which creates avoidable pressure and rework.',
+      'Some decisions are clear, but key calls still drift until they become urgent.',
+      'The decision system is forming. Now make ownership and timing non-negotiable.',
+      'Decision-making is disciplined. Your next win is protecting it as the business grows.'
+    ],
+    operationalSimplicity: [
+      'Complexity is running the business. You’re paying for friction in time, payroll, and stress.',
+      'You’re functioning, but the business still relies on workarounds and memory.',
+      'Systems are workable. Now remove the steps that create repeat problems.',
+      'Operations are clean. Your next win is preventing complexity creep.'
+    ],
+    ownerLeverage: [
+      'You are the system. The business runs on your attention — which keeps you trapped.',
+      'You’re delegating, but the business still pulls you back as the default problem-solver.',
+      'Leverage is building. Now protect owner time and reduce dependency further.',
+      'Owner leverage is strong. Your next win is scaling without dragging you back in.'
+    ]
+  };
+
+  const actionLists = {
+    profitClarity: [
+      'List your top 5 profit creators and top 5 profit consumers (real examples).',
+      'Choose 1 offer or customer type to stop discounting for 30 days.',
+      'Create a weekly 15-minute “Profit Reality” check: what created profit, what consumed it.'
+    ],
+    decisionDiscipline: [
+      'Write the 5 decisions that drive most results (pricing, hiring, delivery, priorities, cash).',
+      'Assign an owner to each decision — one person, one call.',
+      'Set a fixed decision cadence (weekly priorities, monthly numbers, quarterly strategy).'
+    ],
+    operationalSimplicity: [
+      'Choose 1 workflow to simplify (sales to delivery, quoting, onboarding, invoicing).',
+      'Remove 2 steps that exist only because of past mistakes.',
+      'Create a one-page checklist so delivery runs without memory.'
+    ],
+    ownerLeverage: [
+      'Identify your top 3 recurring interruptions and assign new owners.',
+      'Create a “decision ladder”: what the team decides vs what escalates to you.',
+      'Block 2× 90-minute “Owner Time” sessions weekly — no meetings, no admin.'
+    ]
+  };
+
+  const decisionPrompts = {
+    profitClarity: 'In the next 90 days, I will protect __________ and contain/stop __________.',
+    decisionDiscipline: 'In the next 90 days, we will stop delaying __________ decisions and decide by __________.',
+    operationalSimplicity: 'In the next 90 days, we will simplify __________ by removing __________.',
+    ownerLeverage: 'In the next 90 days, I will remove myself from __________ and empower __________ instead.'
+  };
+
+  const controlSummaries = [
+    'Right now, control is low. Expect cashflow pressure and constant rework unless you simplify and tighten decisions.',
+    'Control is inconsistent. Small improvements will reduce pressure fast.',
+    'Control is improving. Focus on stabilising what works and removing friction.',
+    'Control is strong. Your job now is keeping it that way as you grow.'
+  ];
+
+  function bandLabel(score) {
+    if (score <= 39) return 'High Chaos Risk';
+    if (score <= 59) return 'Unstable';
+    if (score <= 79) return 'Improving';
+    return 'Controlled';
+  }
+
+  function bandIndex(score) {
+    if (score <= 39) return 0;
+    if (score <= 59) return 1;
+    if (score <= 79) return 2;
+    return 3;
+  }
+
+  function defaultState() {
+    const answers = {};
+    pillars.forEach(p => p.questions.forEach(q => { answers[q.id] = null; }));
+    return { step: 0, answers };
+  }
+
+  function saveState(state) {
+    localStorage.setItem(storageKey, JSON.stringify(state));
+  }
+
+  function loadState() {
+    const raw = localStorage.getItem(storageKey);
+    if (!raw) return defaultState();
+    try {
+      const parsed = JSON.parse(raw);
+      if (!parsed.answers) return defaultState();
+      return parsed;
+    } catch (e) {
+      return defaultState();
+    }
+  }
+
+  function clearState() {
+    localStorage.removeItem(storageKey);
+    state = defaultState();
+    renderStep();
+  }
+
+  function computeScores() {
+    const pillarScores = pillars.map(pillar => {
+      const raw = pillar.questions.reduce((sum, q) => sum + (Number(state.answers[q.id]) || 0), 0);
+      const percent = Math.round(((raw - 6) / 24) * 100);
+      return { key: pillar.key, name: pillar.name, color: pillar.color, accent: pillar.accent, raw, percent };
+    });
+    const controlIndex = Math.round(pillarScores.reduce((sum, p) => sum + p.percent, 0) / pillarScores.length);
+    const weakest = pillarScores.reduce((min, p) => p.percent < min.percent ? p : min, pillarScores[0]);
+    const strongest = pillarScores.reduce((max, p) => p.percent > max.percent ? p : max, pillarScores[0]);
+
+    // Tiebreaker for weakest
+    const order = ['profitClarity', 'decisionDiscipline', 'operationalSimplicity', 'ownerLeverage'];
+    const lowestScore = Math.min(...pillarScores.map(p => p.percent));
+    const weakestCandidates = pillarScores.filter(p => p.percent === lowestScore);
+    let weakestPillar = weakest;
+    if (weakestCandidates.length > 1) {
+      const sorted = order.map(key => weakestCandidates.find(p => p.key === key)).filter(Boolean);
+      weakestPillar = sorted[0] || weakest;
+    }
+
+    return { pillarScores, controlIndex, weakestPillar, strongestPillar: strongest };
+  }
+
+  function createOption(questionId, value) {
+    const labelId = `pcs-${questionId}-${value}`;
+    const descriptions = {
+      1: 'Strongly Disagree',
+      2: 'Disagree',
+      3: 'Neutral',
+      4: 'Agree',
+      5: 'Strongly Agree'
+    };
+    const wrapper = document.createElement('div');
+    wrapper.className = 'pcs-option';
+    const input = document.createElement('input');
+    input.type = 'radio';
+    input.name = questionId;
+    input.id = labelId;
+    input.value = value;
+    input.checked = state.answers[questionId] === value;
+    input.addEventListener('change', () => {
+      state.answers[questionId] = value;
+      saveState(state);
+      renderStep();
+    });
+    const label = document.createElement('label');
+    label.setAttribute('for', labelId);
+    label.innerHTML = `${value}<span>${descriptions[value]}</span>`;
+    wrapper.appendChild(input);
+    wrapper.appendChild(label);
+    return wrapper;
+  }
+
+  function renderIntro() {
+    const card = document.createElement('div');
+    card.className = 'pcs-card';
+    const title = document.createElement('h1');
+    title.className = 'pcs-title';
+    title.textContent = 'Profit & Control Scorecard';
+    const subtitle = document.createElement('p');
+    subtitle.className = 'pcs-subtitle';
+    subtitle.textContent = 'Find what’s driving profit, what’s driving chaos — and what to fix in the next 90 days.';
+    const microcopy = document.createElement('p');
+    microcopy.className = 'pcs-microcopy';
+    microcopy.textContent = 'Control doesn’t come from working harder. It comes from better decisions with less effort.';
+    const startBtn = document.createElement('button');
+    startBtn.className = 'pcs-btn-primary';
+    startBtn.textContent = 'Start (3–6 mins)';
+    startBtn.addEventListener('click', () => {
+      state.step = 1;
+      saveState(state);
+      renderStep();
+    });
+    card.appendChild(title);
+    card.appendChild(subtitle);
+    card.appendChild(microcopy);
+    const action = document.createElement('div');
+    action.className = 'pcs-action';
+    action.appendChild(startBtn);
+    card.appendChild(action);
+    return card;
+  }
+
+  function renderQuestions(pillarIndex) {
+    const pillar = pillars[pillarIndex];
+    const card = document.createElement('div');
+    card.className = 'pcs-card';
+    const header = document.createElement('div');
+    header.className = 'pcs-header';
+    const left = document.createElement('div');
+    const title = document.createElement('h2');
+    title.className = 'pcs-title';
+    title.textContent = `Pillar ${pillarIndex + 1} — ${pillar.name}`;
+    const subtitle = document.createElement('p');
+    subtitle.className = 'pcs-subtitle';
+    subtitle.textContent = 'Rate each statement. Be honest; this is for you.';
+    left.appendChild(title);
+    left.appendChild(subtitle);
+    const pill = document.createElement('span');
+    pill.className = `pcs-pill ${pillar.color}`;
+    pill.textContent = pillar.name;
+    header.appendChild(left);
+    header.appendChild(pill);
+    card.appendChild(header);
+
+    const microcopy = document.createElement('p');
+    microcopy.className = 'pcs-microcopy';
+    microcopy.textContent = 'Control doesn’t come from working harder. It comes from better decisions with less effort.';
+    card.appendChild(microcopy);
+
+    pillar.questions.forEach(q => {
+      const qWrap = document.createElement('div');
+      qWrap.className = 'pcs-question';
+      const qTitle = document.createElement('h4');
+      qTitle.textContent = q.text;
+      const options = document.createElement('div');
+      options.className = 'pcs-options';
+      [1,2,3,4,5].forEach(val => options.appendChild(createOption(q.id, val)));
+      qWrap.appendChild(qTitle);
+      qWrap.appendChild(options);
+      card.appendChild(qWrap);
+    });
+    return card;
+  }
+
+  function renderResults() {
+    const { pillarScores, controlIndex, weakestPillar, strongestPillar } = computeScores();
+    const card = document.createElement('div');
+    card.className = 'pcs-card';
+
+    const header = document.createElement('div');
+    header.className = 'pcs-header';
+    const title = document.createElement('h2');
+    title.className = 'pcs-title';
+    title.textContent = 'Your Scorecard';
+    const resetLink = document.createElement('span');
+    resetLink.className = 'pcs-reset';
+    resetLink.textContent = 'Retake / Reset';
+    resetLink.addEventListener('click', clearState);
+    header.appendChild(title);
+    header.appendChild(resetLink);
+    card.appendChild(header);
+
+    const band = bandLabel(controlIndex);
+    const bandIdx = bandIndex(controlIndex);
+
+    const summary = document.createElement('div');
+    summary.className = 'pcs-card pcs-highlight';
+    summary.innerHTML = `
+      <div class="pcs-header">
+        <div>
+          <p class="pcs-muted" style="margin:0;">Control Index</p>
+          <h3 class="pcs-control-index">${controlIndex}</h3>
+          <p class="pcs-band">${band}</p>
+          <p class="pcs-subtitle" style="max-width:640px;">${controlSummaries[bandIdx]}</p>
+          <p class="pcs-microcopy">Most owners don’t have a profit problem. They have an attention problem.</p>
+        </div>
+      </div>
+    `;
+    card.appendChild(summary);
+
+    const scoreGrid = document.createElement('div');
+    scoreGrid.className = 'pcs-pillars';
+    pillarScores.forEach(p => {
+      const pCard = document.createElement('div');
+      pCard.className = 'pcs-card';
+      const label = document.createElement('div');
+      label.className = 'pcs-header';
+      const left = document.createElement('div');
+      left.innerHTML = `<p class="pcs-muted" style="margin:0;">${p.name}</p><h3 style="margin:4px 0;">${p.percent}%</h3><p class="pcs-band">${bandLabel(p.percent)}</p>`;
+      const pill = document.createElement('span');
+      pill.className = `pcs-pill ${p.color}`;
+      pill.textContent = p.name;
+      label.appendChild(left);
+      label.appendChild(pill);
+      const bar = document.createElement('div');
+      bar.className = 'pcs-bar';
+      const fill = document.createElement('div');
+      fill.className = 'pcs-bar-fill';
+      fill.style.width = `${Math.max(0, Math.min(100, p.percent))}%`;
+      fill.style.background = p.accent;
+      bar.appendChild(fill);
+      pCard.appendChild(label);
+      pCard.appendChild(bar);
+      scoreGrid.appendChild(pCard);
+    });
+    card.appendChild(scoreGrid);
+
+    const plan = document.createElement('div');
+    plan.className = 'pcs-results-grid';
+
+    const focus = document.createElement('div');
+    focus.className = 'pcs-card';
+    focus.innerHTML = `
+      <div class="pcs-header">
+        <div>
+          <p class="pcs-muted" style="margin:0;">90-Day Focus Plan</p>
+          <h3 style="margin:4px 0;">${weakestPillar.name} <span class="pcs-badge">Your Priority</span></h3>
+          <p class="pcs-band">${bandLabel(weakestPillar.percent)} (${weakestPillar.percent}%)</p>
+        </div>
+      </div>
+      <p style="margin-top:0;">${insightTemplates[weakestPillar.key][bandIndex(weakestPillar.percent)]}</p>
+      <div class="pcs-actions">
+        <p class="pcs-muted" style="margin-bottom:4px;">Next Actions</p>
+        <ul>${actionLists[weakestPillar.key].map(a => `<li>${a}</li>`).join('')}</ul>
+      </div>
+      <p class="pcs-microcopy"><strong>90-Day Decision:</strong> ${decisionPrompts[weakestPillar.key]}</p>
+    `;
+
+    const wins = document.createElement('div');
+    wins.className = 'pcs-card';
+    wins.innerHTML = `
+      <p class="pcs-muted" style="margin:0;">Quick Wins</p>
+      <h3 style="margin:6px 0;">${strongestPillar.name}</h3>
+      <p>${strongestPillar.name} is your current strength. Use it to support the 90-day priority.</p>
+    `;
+
+    plan.appendChild(focus);
+    plan.appendChild(wins);
+    card.appendChild(plan);
+
+    const exportRow = document.createElement('div');
+    exportRow.className = 'pcs-export';
+    const copyBtn = document.createElement('button');
+    copyBtn.className = 'pcs-btn-secondary';
+    copyBtn.textContent = 'Copy Summary';
+    copyBtn.addEventListener('click', () => copySummary({ pillarScores, controlIndex, weakestPillar, strongestPillar }));
+    const restartBtn = document.createElement('button');
+    restartBtn.className = 'pcs-btn-primary';
+    restartBtn.textContent = 'Retake / Reset';
+    restartBtn.addEventListener('click', clearState);
+    exportRow.appendChild(copyBtn);
+    exportRow.appendChild(restartBtn);
+    card.appendChild(exportRow);
+
+    return card;
+  }
+
+  function renderNav() {
+    const nav = document.createElement('div');
+    nav.className = 'pcs-nav';
+    const back = document.createElement('button');
+    back.className = 'pcs-btn-secondary';
+    back.textContent = 'Back';
+    back.disabled = state.step === 0;
+    back.addEventListener('click', () => {
+      if (state.step > 0) {
+        state.step -= 1;
+        saveState(state);
+        renderStep();
+      }
+    });
+
+    const next = document.createElement('button');
+    next.className = 'pcs-btn-primary';
+    next.textContent = state.step === pillars.length ? 'See Results' : 'Next';
+    const isLastQuestionStep = state.step >= 1 && state.step <= pillars.length;
+    if (isLastQuestionStep && !stepComplete(state.step)) {
+      next.disabled = true;
+    }
+    next.addEventListener('click', () => {
+      if (state.step < pillars.length) {
+        if (!stepComplete(state.step)) return;
+        state.step += 1;
+        saveState(state);
+        renderStep();
+      } else if (state.step === pillars.length) {
+        state.step = pillars.length + 1;
+        saveState(state);
+        renderStep();
+      }
+    });
+
+    const reset = document.createElement('span');
+    reset.className = 'pcs-reset';
+    reset.textContent = 'Reset';
+    reset.addEventListener('click', clearState);
+
+    nav.appendChild(back);
+    nav.appendChild(reset);
+    nav.appendChild(next);
+    return nav;
+  }
+
+  function stepComplete(stepNumber) {
+    const pillar = pillars[stepNumber - 1];
+    if (!pillar) return true;
+    return pillar.questions.every(q => state.answers[q.id]);
+  }
+
+  function renderProgress() {
+    const progressWrap = document.createElement('div');
+    const progress = document.createElement('div');
+    progress.className = 'pcs-progress';
+    const fill = document.createElement('div');
+    fill.className = 'pcs-progress-fill';
+    const totalSteps = pillars.length + 1; // question steps + results
+    const completedSteps = Math.min(state.step, totalSteps);
+    fill.style.width = `${(completedSteps / totalSteps) * 100}%`;
+    progress.appendChild(fill);
+    progressWrap.appendChild(progress);
+    return progressWrap;
+  }
+
+  function copySummary(data) {
+    const { pillarScores, controlIndex, weakestPillar, strongestPillar } = data;
+    const lines = [];
+    lines.push(`Control Index: ${controlIndex} (${bandLabel(controlIndex)})`);
+    pillarScores.forEach(p => {
+      lines.push(`${p.name}: ${p.percent}% (${bandLabel(p.percent)})`);
+    });
+    lines.push(`Priority Pillar: ${weakestPillar.name}`);
+    lines.push(`Strength Pillar: ${strongestPillar.name}`);
+    lines.push('90-Day Focus:');
+    lines.push(`- Insight: ${insightTemplates[weakestPillar.key][bandIndex(weakestPillar.percent)]}`);
+    actionLists[weakestPillar.key].forEach(a => lines.push(`- ${a}`));
+    lines.push(`- Decision: ${decisionPrompts[weakestPillar.key]}`);
+    const text = lines.join('\n');
+    navigator.clipboard.writeText(text).then(() => {
+      alert('Summary copied. Paste into email or notes.');
+    });
+  }
+
+  function renderStep() {
+    container.innerHTML = '';
+    if (state.step === 0) {
+      container.appendChild(renderIntro());
+      return;
+    }
+    if (state.step >= 1 && state.step <= pillars.length) {
+      container.appendChild(renderProgress());
+      container.appendChild(renderQuestions(state.step - 1));
+      container.appendChild(renderNav());
+      return;
+    }
+    if (state.step === pillars.length + 1) {
+      container.appendChild(renderProgress());
+      container.appendChild(renderResults());
+      return;
+    }
+  }
+
+  let state = loadState();
+  renderStep();
+})();
+</script>
+</body>
+</html>
